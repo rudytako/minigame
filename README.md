@@ -1,4 +1,4 @@
-A simple Minecraft minigame, where a player's objective is to break 20 blocks in the fastest way.</br>
+A simple Minecraft minigame, where player's objective is to break 20 blocks in the fastest way.</br>
 features:</br>
 - chat commands auto complete</br>
 - arena selection in the lobby</br>
