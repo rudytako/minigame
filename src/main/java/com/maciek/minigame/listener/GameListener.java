@@ -4,6 +4,7 @@ import com.maciek.minigame.GameState;
 import com.maciek.minigame.Minigame;
 import com.maciek.minigame.instance.Arena;
 import com.maciek.minigame.kit.KitType;
+import com.maciek.minigame.team.TeamType;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,25 +21,41 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onClick(InventoryClickEvent e) {
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getCurrentItem() == null) return;
+
         Player player = (Player) e.getWhoClicked();
-
-        if (!(e.getView().getTitle().contains("Kit Selection")) || e.getCurrentItem() == null) return;
-
-        KitType type = KitType.valueOf(e.getCurrentItem().getItemMeta().getLocalizedName());
-
         Arena arena = minigame.getArenaManager().getArena(player);
+
         if (arena == null) return;
 
-        KitType activated = arena.getKitType(player);
-        if (activated != null && activated == type) {
-            player.sendMessage(ChatColor.RED + "You already have this kit equipped.");
-            player.closeInventory();
-            return;
+        switch (e.getView().getTitle()) {
+            case "Kit Selection":
+                KitType type = KitType.valueOf(e.getCurrentItem().getItemMeta().getLocalizedName());
+
+                KitType activated = arena.getKitType(player);
+                if (activated != null && activated == type) {
+                    player.sendMessage(ChatColor.RED + "You already have this kit equipped.");
+                    player.closeInventory();
+                    return;
+                }
+
+                arena.setKit(player.getUniqueId(), type);
+                player.sendMessage(ChatColor.GREEN + "You have equipped the " + type.getDisplay() + ChatColor.GREEN + " kit.");
+
+            case "Team selection":
+                TeamType team = TeamType.valueOf(e.getCurrentItem().getItemMeta().getLocalizedName());
+
+                if (arena.getTeam(player) == team) {
+                    player.sendMessage(ChatColor.RED + "You are already on this team.");
+                    return;
+                }
+
+                arena.setTeam(player, team);
+                player.sendMessage(ChatColor.AQUA + "You are now on " + team.getDisplay() + " team.");
         }
 
-        arena.setKit(player.getUniqueId(), type);
-        player.sendMessage(ChatColor.GREEN + "You have equipped the " + type.getDisplay() + ChatColor.GREEN + " kit.");
+        e.setCancelled(true);
         player.closeInventory();
     }
 

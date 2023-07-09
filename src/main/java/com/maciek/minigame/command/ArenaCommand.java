@@ -3,6 +3,8 @@ package com.maciek.minigame.command;
 import com.maciek.minigame.GameState;
 import com.maciek.minigame.Minigame;
 import com.maciek.minigame.instance.Arena;
+import com.maciek.minigame.kit.KitUI;
+import com.maciek.minigame.team.TeamUI;
 import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -80,16 +82,33 @@ public class ArenaCommand implements CommandExecutor {
 
                 break;
             case "kit":
-                Arena arena = minigame.getArenaManager().getArena(player);
+                Arena arenaKit = minigame.getArenaManager().getArena(player);
 
-                if (arena == null) {
+                if (arenaKit == null) {
                     player.sendMessage(ChatColor.RED + "You are not in an arena.");
                     break;
                 }
 
-                if (arena.getState() == GameState.LIVE) {
+                if (arenaKit.getState() == GameState.LIVE) {
                     player.sendMessage(ChatColor.RED + "You cannot select a kit at this time!");
                 }
+
+                new KitUI(player);
+
+                break;
+            case "team":
+                Arena arenaTeam = minigame.getArenaManager().getArena(player);
+
+                if (arenaTeam == null) {
+                    player.sendMessage(ChatColor.RED + "You are not in an arena.");
+                    break;
+                }
+
+                if (arenaTeam.getState() == GameState.LIVE) {
+                    player.sendMessage(ChatColor.RED + "You cannot select a team at this time!");
+                }
+
+                new TeamUI(arenaTeam, player);
 
                 break;
             default:
@@ -98,6 +117,7 @@ public class ArenaCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.RED + "- /arena leave");
                 player.sendMessage(ChatColor.RED + "- /arena join <id>");
                 player.sendMessage(ChatColor.RED + "- /arena kit");
+                player.sendMessage(ChatColor.RED + "- /arena team");
                 break;
         }
 

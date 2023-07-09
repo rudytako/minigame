@@ -1,5 +1,6 @@
 package com.maciek.minigame.instance;
 
+import com.google.common.collect.TreeMultimap;
 import com.maciek.minigame.GameState;
 import com.maciek.minigame.Minigame;
 import com.maciek.minigame.kit.Kit;
@@ -7,6 +8,7 @@ import com.maciek.minigame.kit.KitType;
 import com.maciek.minigame.kit.type.FighterKit;
 import com.maciek.minigame.kit.type.MinerKit;
 import com.maciek.minigame.manager.ConfigManager;
+import com.maciek.minigame.team.TeamType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -27,18 +29,22 @@ public class Arena {
     private GameState state;
     private List<UUID> players;
     private HashMap<UUID, Kit> kits;
+    private HashMap<UUID, TeamType> teams;
     private Countdown countdown;
     private Game game;
 
-    public Arena(Minigame minigame, int id, Location spawn) {
+    public Arena(Minigame minigame, int id, Location spawn, HashMap<UUID, TeamType> teams) {
         this.minigame = minigame;
 
         this.id = id;
         this.spawn = spawn;
 
         this.state = GameState.RECRUITING;
+
         this.players = new ArrayList<>();
         this.kits = new HashMap<>();
+        this.teams = new HashMap<>();
+
         this.countdown = new Countdown(minigame, this);
         this.game = new Game(this);
     }
@@ -58,9 +64,9 @@ public class Arena {
                 removeKit(player.getUniqueId());
             }
             players.clear();
+            kits.clear();
+            teams.clear();
         }
-
-        kits.clear();
 
         sendTitle("", "");
 
@@ -89,6 +95,15 @@ public class Arena {
     public void addPlayer(Player player) {
         players.add(player.getUniqueId());
         player.teleport(spawn);
+
+        TreeMultimap<Integer, TeamType> count = TreeMultimap.create();
+        for (TeamType team : teams.values()) {
+            count.put(getTeamCount(team), team);
+        }
+
+        TeamType lowest = (TeamType) count.values().toArray()[0];
+        setTeam(player, lowest);
+        player.sendMessage(ChatColor.AQUA + "You've been automatically placed on " + lowest.getDisplay() + ChatColor.AQUA + " team");
 
         player.sendMessage(ChatColor.GOLD + "Choose your kit with /arena kit");
 
@@ -162,5 +177,32 @@ public class Arena {
 
     public KitType getKitType(Player player) {
         return kits.containsKey(player.getUniqueId()) ? kits.get(player.getUniqueId()).getType() : null;
+    }
+
+    /* TEAMS */
+
+    public void setTeam(Player player, TeamType team) {
+        removeTeam(player);
+        teams.put(player.getUniqueId(), team);
+    }
+
+    public void removeTeam(Player player) {
+        if (teams.containsKey(player.getUniqueId())) {
+            teams.remove(player.getUniqueId());
+        }
+    }
+
+    public int getTeamCount(TeamType team) {
+        int amount = 0;
+        for (TeamType t : teams.values()) {
+            if (t == team) {
+                amount++;
+            }
+        }
+        return amount;
+    }
+
+    public TeamType getTeam(Player player) {
+        return teams.get(player.getUniqueId());
     }
 }
