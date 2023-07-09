@@ -33,7 +33,7 @@ public class Arena {
     private Countdown countdown;
     private Game game;
 
-    public Arena(Minigame minigame, int id, Location spawn, HashMap<UUID, TeamType> teams) {
+    public Arena(Minigame minigame, int id, Location spawn) {
         this.minigame = minigame;
 
         this.id = id;

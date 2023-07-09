@@ -25,7 +25,7 @@ public class ArenaManager {
                     config.getDouble("arenas." + str + ".z"),
                     (float) config.getDouble("arenas." + str + ".yaw"),
                     (float) config.getDouble("arenas." + str + ".pitch")
-            ), teams));
+            )));
         }
     }
 
