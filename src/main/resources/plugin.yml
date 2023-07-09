@@ -1,0 +1,7 @@
+name: minigame
+version: '${project.version}'
+main: com.maciek.minigame.Minigame
+api-version: 1.17
+commands:
+  arena:
+
