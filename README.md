@@ -5,3 +5,4 @@ features:</br>
 - customizable config file</br>
 - kit selection to choose the starting tool.</br>
 - team selection</br>
+- customizable config</br>
